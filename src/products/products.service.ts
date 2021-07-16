@@ -1,53 +1,65 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
+import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './product.model';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ProductsService {
-  products: Product[] = [];
+  constructor(
+    @InjectModel('Product') private readonly productModel: Model<Product>,
+  ) {}
 
-  insertProduct(title: string, description: string, price: number): string {
-    const prodId = Math.random().toString();
-    const newProduct = new Product(prodId, title, description, price);
-    this.products.push(newProduct);
-    return prodId;
+  async insertProduct(
+    title: string,
+    description: string,
+    price: number,
+  ): Promise<string> {
+    const newProduct = new this.productModel({ title, description, price });
+    const result = await newProduct.save();
+    return result.id;
   }
 
-  getProducts() {
-    return [...this.products];
+  async getProducts() {
+    const products = await this.productModel.find();
+    return products.map((product) => ({
+      id: product._id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    }));
   }
 
-  private findProduct(id: string): [Product, number] {
-    const productIndex = this.products.findIndex((p) => p.id === id);
-    const product = this.products[productIndex];
-    if (!product) {
-      throw new NotFoundException('Could not find product with id ' + id);
-    }
-    return [product, productIndex];
+  async getProductById(id: string) {
+    const product = await this.productModel.findById(id);
+    return {
+      id: product._id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    };
   }
 
-  getProductById(id: string): Product {
-    const product = this.findProduct(id)[0];
-    return { ...product };
-  }
-
-  updateProduct(
+  async updateProduct(
     id: string,
     title: string,
     description: string,
     price: number,
-  ): Product {
-    const [product, index] = this.findProduct(id);
+  ) {
+    const product = await this.productModel.findById(id);
     product.title = title ? title : product.title;
     product.description = description ? description : product.description;
     product.price = price ? price : product.price;
-    this.products[index] = product;
-    return { ...product };
+    await product.save();
+    return {
+      id: product._id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    };
   }
 
-  removeProductById(id: string): string {
-    const [product, index] = this.findProduct(id);
-    this.products.splice(index, 1);
-    return `Removed product: ${product.id}`;
+  async removeProductById(id: string) {
+    const product = await this.productModel.findByIdAndDelete(id);
+    return { removedProductId: product._id };
   }
 }

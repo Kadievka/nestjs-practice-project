@@ -1,5 +1,12 @@
-import { Delete, Get, Param, Patch } from '@nestjs/common';
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Delete,
+  Get,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 
 @Controller('products')
@@ -7,12 +14,12 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  addProduct(
+  async addProduct(
     @Body('title') title: string,
     @Body('description') description: string,
     @Body('price') price: number,
-  ): { id: string } {
-    const generatedId = this.productsService.insertProduct(
+  ): Promise<{ id: string }> {
+    const generatedId = await this.productsService.insertProduct(
       title,
       description,
       price,
