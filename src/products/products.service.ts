@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './product.model';
 import { Model } from 'mongoose';
+import { threadId } from 'worker_threads';
 
 @Injectable()
 export class ProductsService {
@@ -9,14 +10,13 @@ export class ProductsService {
     @InjectModel('Product') private readonly productModel: Model<Product>,
   ) {}
 
-  async insertProduct(
-    title: string,
-    description: string,
-    price: number,
-  ): Promise<string> {
-    const newProduct = new this.productModel({ title, description, price });
-    const result = await newProduct.save();
-    return result.id;
+  async insertProduct(product: {
+    title: string;
+    description: string;
+    price: number;
+  }): Promise<string> {
+    const newProduct = await this.productModel.create(product);
+    return newProduct.id;
   }
 
   async getProducts() {
@@ -29,8 +29,16 @@ export class ProductsService {
     }));
   }
 
-  async getProductById(id: string) {
+  async getProductById(id: string): Promise<{
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+  }> {
     const product = await this.productModel.findById(id);
+    if (!product) {
+      throw new NotFoundException('Can not find product with id ' + id);
+    }
     return {
       id: product._id,
       title: product.title,
@@ -41,21 +49,16 @@ export class ProductsService {
 
   async updateProduct(
     id: string,
-    title: string,
-    description: string,
-    price: number,
+    requestProduct: { title: string; description: string; price: number },
   ) {
-    const product = await this.productModel.findById(id);
-    product.title = title ? title : product.title;
-    product.description = description ? description : product.description;
-    product.price = price ? price : product.price;
-    await product.save();
-    return {
-      id: product._id,
-      title: product.title,
-      description: product.description,
-      price: product.price,
-    };
+    const product = await this.getProductById(id);
+    console.log(product);
+    if (requestProduct.title) product.title = requestProduct.title;
+    if (requestProduct.price) product.price = requestProduct.price;
+    if (requestProduct.description) product.description = requestProduct.description;
+    console.log(product);
+    await this.productModel.findByIdAndUpdate(id, product);
+    return product;
   }
 
   async removeProductById(id: string) {

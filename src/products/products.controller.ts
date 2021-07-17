@@ -15,15 +15,9 @@ export class ProductsController {
 
   @Post()
   async addProduct(
-    @Body('title') title: string,
-    @Body('description') description: string,
-    @Body('price') price: number,
+    @Body() body: { title: string; description: string; price: number },
   ): Promise<{ id: string }> {
-    const generatedId = await this.productsService.insertProduct(
-      title,
-      description,
-      price,
-    );
+    const generatedId = await this.productsService.insertProduct(body);
     return {
       id: generatedId,
     };
@@ -42,11 +36,14 @@ export class ProductsController {
   @Patch(':id')
   updateProduct(
     @Param('id') id: string,
-    @Body('title') title: string,
-    @Body('description') description: string,
-    @Body('price') price: number,
+    @Body()
+    body: {
+      title: string;
+      description: string;
+      price: number;
+    },
   ) {
-    return this.productsService.updateProduct(id, title, description, price);
+    return this.productsService.updateProduct(id, body);
   }
 
   @Delete(':id')
