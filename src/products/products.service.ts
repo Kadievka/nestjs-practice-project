@@ -61,7 +61,8 @@ export class ProductsService {
   }
 
   async removeProductById(id: string) {
-    const product = await this.productModel.findByIdAndDelete(id);
-    return { removedProductId: product._id };
+    await this.getProductById(id);
+    await this.productModel.findByIdAndDelete(id);
+    return { removedProductId: id };
   }
 }
