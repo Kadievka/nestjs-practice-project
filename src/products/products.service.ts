@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './product.model';
 import { Model } from 'mongoose';
-import { threadId } from 'worker_threads';
 
 @Injectable()
 export class ProductsService {
@@ -19,7 +18,7 @@ export class ProductsService {
     return newProduct.id;
   }
 
-  async getProducts() {
+  async getProducts(): Promise<Product[]> {
     const products = await this.productModel.find();
     return products.map((product) => ({
       id: product._id,
@@ -29,12 +28,7 @@ export class ProductsService {
     }));
   }
 
-  async getProductById(id: string): Promise<{
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-  }> {
+  async getProductById(id: string): Promise<Product> {
     const product = await this.productModel.findById(id);
     if (!product) {
       throw new NotFoundException('Can not find product with id ' + id);
@@ -50,7 +44,7 @@ export class ProductsService {
   async updateProduct(
     id: string,
     requestProduct: { title: string; description: string; price: number },
-  ) {
+  ): Promise<Product> {
     const product = await this.getProductById(id);
     if (requestProduct.title) product.title = requestProduct.title;
     if (requestProduct.price) product.price = requestProduct.price;
@@ -60,9 +54,9 @@ export class ProductsService {
     return product;
   }
 
-  async removeProductById(id: string) {
+  async removeProductById(id: string): Promise<{ id: string }> {
     await this.getProductById(id);
     await this.productModel.findByIdAndDelete(id);
-    return { removedProductId: id };
+    return { id };
   }
 }
