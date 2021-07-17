@@ -6,7 +6,7 @@ import { Model } from 'mongoose';
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel('Product') private readonly productModel: Model<Product>,
+    @InjectModel('Product') private readonly ProductModel: Model<Product>,
   ) {}
 
   async insertProduct(product: {
@@ -14,12 +14,12 @@ export class ProductsService {
     description: string;
     price: number;
   }): Promise<string> {
-    const newProduct = await this.productModel.create(product);
+    const newProduct = await this.ProductModel.create(product);
     return newProduct.id;
   }
 
   async getProducts(): Promise<Product[]> {
-    const products = await this.productModel.find();
+    const products = await this.ProductModel.find();
     return products.map((product) => ({
       id: product._id,
       title: product.title,
@@ -29,7 +29,7 @@ export class ProductsService {
   }
 
   async getProductById(id: string): Promise<Product> {
-    const product = await this.productModel.findById(id);
+    const product = await this.ProductModel.findById(id);
     if (!product) {
       throw new NotFoundException('Can not find product with id ' + id);
     }
@@ -50,13 +50,13 @@ export class ProductsService {
     if (requestProduct.price) product.price = requestProduct.price;
     if (requestProduct.description)
       product.description = requestProduct.description;
-    await this.productModel.findByIdAndUpdate(id, product);
+    await this.ProductModel.findByIdAndUpdate(id, product);
     return product;
   }
 
   async removeProductById(id: string): Promise<{ id: string }> {
     await this.getProductById(id);
-    await this.productModel.findByIdAndDelete(id);
+    await this.ProductModel.findByIdAndDelete(id);
     return { id };
   }
 }
