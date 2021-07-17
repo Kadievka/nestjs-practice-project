@@ -52,11 +52,10 @@ export class ProductsService {
     requestProduct: { title: string; description: string; price: number },
   ) {
     const product = await this.getProductById(id);
-    console.log(product);
     if (requestProduct.title) product.title = requestProduct.title;
     if (requestProduct.price) product.price = requestProduct.price;
-    if (requestProduct.description) product.description = requestProduct.description;
-    console.log(product);
+    if (requestProduct.description)
+      product.description = requestProduct.description;
     await this.productModel.findByIdAndUpdate(id, product);
     return product;
   }
