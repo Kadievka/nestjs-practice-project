@@ -35,7 +35,7 @@ export class ProductsService {
     }));
   }
 
-  async findProduct(id): Promise<Product> {
+  async findProduct(id: string): Promise<Product> {
     const product = await this.ProductModel.findById(id);
     if (!product) {
       throw new NotFoundException('Can not find product with id ' + id);
