@@ -3,6 +3,7 @@ import {
   Controller,
   Post,
   Put,
+  Req,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -12,8 +13,7 @@ import { JoiValidationPipe } from '../joi.validation.pipe';
 import loginSchema from './login.schema';
 import emailSchema from './email.schema';
 import profileSchema from './profile.schema';
-import { JwtAuthGuard } from './jwtAuth.guard';
-import { Req } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwtAuth.guard';
 
 @Controller('users')
 export class UsersController {

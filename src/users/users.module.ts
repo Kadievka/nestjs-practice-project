@@ -4,8 +4,8 @@ import { UsersController } from './user.controller';
 import { UserSchema } from './user.model';
 import { UsersService } from './user.service';
 import { JwtModule } from '@nestjs/jwt';
-import { authConstants } from './auth.constants';
-import { JwtStrategy } from './jwt.strategy';
+import { authConstants } from '../auth/auth.constants';
+import { JwtStrategy } from '../auth/jwt.strategy';
 @Module({
   imports: [
     JwtModule.register({ secret: authConstants.secret }),
