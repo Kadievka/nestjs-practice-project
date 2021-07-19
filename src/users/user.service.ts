@@ -7,12 +7,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import userErrors from './user.errors';
 import { User } from './user.model';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
     @InjectModel('User') private readonly UserModel: Model<User>,
   ) {}
 
@@ -40,14 +40,6 @@ export class UsersService {
     return { email: createdUser.email };
   }
 
-  sendJWT(id, email): { email: string; jwt: string } {
-    const token = this.jwtService.sign({
-      email: email,
-      sub: id,
-    });
-    return { email: email, jwt: token };
-  }
-
   async login(user: {
     email: string;
     password: string;
@@ -57,14 +49,14 @@ export class UsersService {
     if (!valid) {
       throw new ForbiddenException();
     }
-    return this.sendJWT(foundUser.id, foundUser.email);
+    return this.authService.sendJWT(foundUser.id, foundUser.email);
   }
 
   async sendJwtToResetPassword(email): Promise<{ email: string; jwt: string }> {
     const user = await this.findUserByEmailOrThrowForbidden(email);
     user.password = null;
     await user.save();
-    return this.sendJWT(user.id, user.email);
+    return this.authService.sendJWT(user.id, user.email);
   }
 
   async updatePassword(user): Promise<{ email: string }> {
