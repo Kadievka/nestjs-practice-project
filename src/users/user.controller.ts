@@ -1,15 +1,26 @@
-import { Body, Controller, Post, Put, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Put,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
 import { UsersService } from './user.service';
-import userSchema from './user.schema';
+import registerSchema from './register.schema';
 import { JoiValidationPipe } from '../joi.validation.pipe';
 import loginSchema from './login.schema';
+import emailSchema from './email.schema';
+import profileSchema from './profile.schema';
+import { JwtAuthGuard } from './jwtAuth.guard';
+import { Req } from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Post()
-  @UsePipes(new JoiValidationPipe(userSchema))
+  @UsePipes(new JoiValidationPipe(registerSchema))
   registerUser(
     @Body() user: { email: string; password: string },
   ): Promise<{ email: string }> {
@@ -22,9 +33,32 @@ export class UsersController {
     return this.userService.login(user);
   }
 
+  @Post('/reset-password')
+  @UsePipes(new JoiValidationPipe(emailSchema))
+  sendJwtToResetPassword(@Body() user: { email: string }) {
+    return this.userService.sendJwtToResetPassword(user.email);
+  }
+
   @Put('/update-password')
-  @UsePipes(new JoiValidationPipe(userSchema))
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new JoiValidationPipe(registerSchema))
   updatePassword(@Body() user: { email: string; password: string }) {
     return this.userService.updatePassword(user);
+  }
+
+  @Put('/update-profile')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new JoiValidationPipe(profileSchema))
+  updateProfile(
+    @Req() req,
+    @Body()
+    information: {
+      firstName: string;
+      lastName: string;
+      cellphone: string;
+      address: string;
+    },
+  ) {
+    return this.userService.updateProfile(req.user.email, information);
   }
 }

@@ -10,6 +10,10 @@ export const UserSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
+  firstName: String,
+  lastName: String,
+  cellphone: String,
+  address: String,
 });
 
 UserSchema.plugin(mongooseBcrypt);
@@ -18,5 +22,9 @@ export interface User extends mongoose.Document {
   id: string;
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
+  cellphone: string;
+  address: string;
   verifyPassword;
 }
