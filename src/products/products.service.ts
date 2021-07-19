@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './product.model';
 import { Model } from 'mongoose';
+import productErrors from './product.errors';
 
 @Injectable()
 export class ProductsService {
@@ -38,7 +39,9 @@ export class ProductsService {
   async findProduct(id: string): Promise<Product> {
     const product = await this.ProductModel.findById(id);
     if (!product) {
-      throw new NotFoundException('Can not find product with id ' + id);
+      throw new NotFoundException(
+        `${productErrors.CAN_NOT_FIND_PRODUCT_ID} ${id}`,
+      );
     }
     return product;
   }
