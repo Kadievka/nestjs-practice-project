@@ -7,7 +7,6 @@ import {
   Param,
   Patch,
 } from '@nestjs/common';
-import { Product } from './product.model';
 import { ProductsService } from './products.service';
 
 @Controller('products')
@@ -25,12 +24,24 @@ export class ProductsController {
   }
 
   @Get()
-  getAllProducts(): Promise<Product[]> {
+  getAllProducts(): Promise<
+    {
+      id: string;
+      title: string;
+      description: string;
+      price: number;
+    }[]
+  > {
     return this.productsService.getProducts();
   }
 
   @Get(':id')
-  getProduct(@Param('id') id: string): Promise<Product> {
+  getProduct(@Param('id') id: string): Promise<{
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+  }> {
     return this.productsService.getProductById(id);
   }
 
@@ -43,7 +54,12 @@ export class ProductsController {
       description: string;
       price: number;
     },
-  ): Promise<Product> {
+  ): Promise<{
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+  }> {
     return this.productsService.updateProduct(id, body);
   }
 
