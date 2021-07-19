@@ -45,7 +45,16 @@ export class UsersService {
       email: foundUser.email,
       sub: foundUser.id,
     });
-
     return { email: foundUser.email, jwt: token };
+  }
+
+  async updatePassword(user) {
+    const foundUser = await this.findUserByEmail(user.email);
+    if (!foundUser) {
+      throw new ForbiddenException();
+    }
+    foundUser.password = user.password;
+    await foundUser.save();
+    return { email: foundUser.email };
   }
 }
