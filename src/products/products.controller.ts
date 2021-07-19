@@ -1,3 +1,4 @@
+import { JoiValidationPipe } from './../joi.validation.pipe';
 import {
   Body,
   Controller,
@@ -6,14 +7,17 @@ import {
   Get,
   Param,
   Patch,
+  UsePipes,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
+import productSchema from './product.schema';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @UsePipes(new JoiValidationPipe(productSchema))
   async addProduct(
     @Body() body: { title: string; description: string; price: number },
   ): Promise<{ id: string }> {
