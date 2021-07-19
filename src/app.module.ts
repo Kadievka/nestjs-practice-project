@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot({
       envFilePath: __dirname + '/../.env',
+      isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DB_CLUSTER),
     ProductsModule,

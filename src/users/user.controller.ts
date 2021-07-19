@@ -14,4 +14,10 @@ export class UsersController {
   ): Promise<{ email: string }> {
     return this.userService.registerUser(user);
   }
+
+  @Post('/login')
+  @UsePipes(new JoiValidationPipe(userSchema))
+  login(@Body() user: { email: string; password: string }) {
+    return this.userService.login(user);
+  }
 }
