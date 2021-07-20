@@ -1,4 +1,4 @@
-import { JoiValidationPipe } from './../joi.validation.pipe';
+import { JoiValidationPipe } from '../pipes/joi.validation.pipe';
 import {
   Body,
   Controller,

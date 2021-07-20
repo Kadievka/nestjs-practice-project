@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import registerSchema from './register.schema';
-import { JoiValidationPipe } from '../joi.validation.pipe';
+import { JoiValidationPipe } from '../pipes/joi.validation.pipe';
 import loginSchema from './login.schema';
 import emailSchema from './email.schema';
 import profileSchema from './profile.schema';
