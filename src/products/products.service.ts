@@ -28,7 +28,7 @@ export class ProductsService {
     return newProduct.id;
   }
 
-  async getProducts(): Promise<
+  async getProductsByUser(userId: string): Promise<
     {
       id: string;
       title: string;
@@ -36,7 +36,7 @@ export class ProductsService {
       price: number;
     }[]
   > {
-    const products = await this.ProductModel.find();
+    const products = await this.ProductModel.find({ userId: userId });
     return products.map((product) => ({
       id: product._id,
       title: product.title,

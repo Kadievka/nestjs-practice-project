@@ -37,7 +37,8 @@ export class ProductsController {
   }
 
   @Get()
-  getAllProducts(): Promise<
+  @UseGuards(JwtAuthGuard)
+  getAllProductsByUser(@Req() req): Promise<
     {
       id: string;
       title: string;
@@ -45,7 +46,7 @@ export class ProductsController {
       price: number;
     }[]
   > {
-    return this.productsService.getProducts();
+    return this.productsService.getProductsByUser(req.user.id);
   }
 
   @Get(':id')
