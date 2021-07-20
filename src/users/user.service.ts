@@ -88,4 +88,21 @@ export class UsersService {
       address: user.address,
     };
   }
+
+  async getUserProfile(email: string): Promise<{
+    email: string;
+    lastName: string;
+    firstName: string;
+    cellphone: string;
+    address: string;
+  }> {
+    const user = await this.findUserByEmailOrThrowForbidden(email);
+    return {
+      email: user.email,
+      lastName: user.lastName,
+      firstName: user.firstName,
+      cellphone: user.cellphone,
+      address: user.address,
+    };
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Put,
   Req,
@@ -135,5 +136,31 @@ export class UsersController {
     profile: ProfileDto,
   ) {
     return this.userService.updateProfile(req.user.email, profile);
+  }
+
+  @Get('/profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Returns the profile information about the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns profile information',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns Unauthorized when jwt in header is invalid',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Returns forbidden when user email is incorrect',
+  })
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Req() req): Promise<{
+    email: string;
+    lastName: string;
+    firstName: string;
+    cellphone: string;
+    address: string;
+  }> {
+    return this.userService.getUserProfile(req.user.email);
   }
 }
