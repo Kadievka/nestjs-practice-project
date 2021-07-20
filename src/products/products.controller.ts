@@ -7,10 +7,13 @@ import {
   Get,
   Param,
   Patch,
+  UseGuards,
   UsePipes,
+  Req,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import productSchema from './product.schema';
+import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
 
 @Controller('products')
 export class ProductsController {
@@ -18,10 +21,16 @@ export class ProductsController {
 
   @Post()
   @UsePipes(new JoiValidationPipe(productSchema))
+  @UseGuards(JwtAuthGuard)
   async addProduct(
-    @Body() body: { title: string; description: string; price: number },
+    @Req() req,
+    @Body()
+    body: { title: string; description: string; price: number; userId: string },
   ): Promise<{ id: string }> {
-    const generatedId = await this.productsService.insertProduct(body);
+    const generatedId = await this.productsService.insertProduct(
+      body,
+      req.user.id,
+    );
     return {
       id: generatedId,
     };
@@ -50,8 +59,10 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   updateProduct(
     @Param('id') id: string,
+    @Req() req,
     @Body()
     body: {
       title: string;
@@ -64,11 +75,12 @@ export class ProductsController {
     description: string;
     price: number;
   }> {
-    return this.productsService.updateProduct(id, body);
+    return this.productsService.updateProduct(id, body, req.user.id);
   }
 
   @Delete(':id')
-  removeProduct(@Param('id') id: string): Promise<{ id: string }> {
-    return this.productsService.removeProductById(id);
+  @UseGuards(JwtAuthGuard)
+  removeProduct(@Param('id') id: string, @Req() req): Promise<{ id: string }> {
+    return this.productsService.removeProductById(id, req.user.id);
   }
 }

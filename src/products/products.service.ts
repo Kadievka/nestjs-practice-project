@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './product.model';
 import { Model } from 'mongoose';
@@ -10,11 +14,16 @@ export class ProductsService {
     @InjectModel('Product') private readonly ProductModel: Model<Product>,
   ) {}
 
-  async insertProduct(product: {
-    title: string;
-    description: string;
-    price: number;
-  }): Promise<string> {
+  async insertProduct(
+    product: {
+      title: string;
+      description: string;
+      price: number;
+      userId: string;
+    },
+    userId: string,
+  ): Promise<string> {
+    product.userId = userId;
     const newProduct = await this.ProductModel.create(product);
     return newProduct.id;
   }
@@ -61,20 +70,26 @@ export class ProductsService {
     };
   }
 
+  async findProductByIdAndUserId(id: string, userId: string): Promise<Product> {
+    const product = await this.findProduct(id);
+    if (product.userId != userId) {
+      throw new ForbiddenException(productErrors.PRODUCT_DOES_NOT_BELONG_USER);
+    }
+    return product;
+  }
+
   async updateProduct(
     id: string,
     requestProduct: { title: string; description: string; price: number },
+    userId: string,
   ): Promise<{
     id: string;
     title: string;
     description: string;
     price: number;
   }> {
-    const product = await this.findProduct(id);
-    if (requestProduct.title) product.title = requestProduct.title;
-    if (requestProduct.price) product.price = requestProduct.price;
-    if (requestProduct.description)
-      product.description = requestProduct.description;
+    const product = await this.findProductByIdAndUserId(id, userId);
+    Object.assign(product, requestProduct);
     await product.save();
     return {
       id: product._id,
@@ -84,8 +99,8 @@ export class ProductsService {
     };
   }
 
-  async removeProductById(id: string): Promise<{ id: string }> {
-    await this.getProductById(id);
+  async removeProductById(id: string, userId: string): Promise<{ id: string }> {
+    await this.findProductByIdAndUserId(id, userId);
     await this.ProductModel.findByIdAndDelete(id);
     return { id };
   }
