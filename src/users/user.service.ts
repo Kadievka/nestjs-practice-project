@@ -59,12 +59,12 @@ export class UsersService {
     return this.authService.sendJWT(user.id, user.email);
   }
 
-  async updatePassword(user): Promise<{ email: string }> {
-    const foundUser = await this.findUserByEmailOrThrowForbidden(user.email);
+  async updatePassword(request, email): Promise<{ email: string }> {
+    const foundUser = await this.findUserByEmailOrThrowForbidden(email);
     if (foundUser.password) {
       throw new ForbiddenException(userErrors.ALREADY_HAVE_PASSWORD);
     }
-    foundUser.password = user.password;
+    foundUser.password = request.password;
     await foundUser.save();
     return { email: foundUser.email };
   }

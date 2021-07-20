@@ -22,13 +22,14 @@
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
-    "@nestjs/common": "^7.6.15",
+    "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.0",
-    "@nestjs/core": "^7.6.15",
+    "@nestjs/core": "^8.0.0",
     "@nestjs/jwt": "^8.0.0",
     "@nestjs/mongoose": "^8.0.0",
     "@nestjs/passport": "^8.0.0",
     "@nestjs/platform-express": "^7.6.15",
+    "@nestjs/swagger": "^5.0.4",
     "dotenv": "^10.0.0",
     "joi": "^17.4.1",
     "mongoose": "^5.13.3",
@@ -37,10 +38,11 @@
     "passport-jwt": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.6"
+    "rxjs": "^6.6.6",
+    "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
-    "@nestjs/cli": "^7.6.0",
+    "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^7.3.0",
     "@nestjs/testing": "^7.6.15",
     "@types/express": "^4.17.11",
