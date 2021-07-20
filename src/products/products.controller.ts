@@ -16,12 +16,13 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiBody,
   ApiParam,
 } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import productSchema from './product.schema';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
+import { AddProductDto } from './addProduct.dto';
+import { UpdateProductDto } from './updateProduct.dto';
 
 @ApiTags('products')
 @Controller('products')
@@ -31,24 +32,6 @@ export class ProductsController {
   @Post()
   @ApiOperation({ summary: 'Adds one product and returns generated id' })
   @ApiBearerAuth()
-  @ApiBody({
-    schema: {
-      properties: {
-        title: {
-          type: 'string',
-          default: 'Product Title',
-        },
-        description: {
-          type: 'string',
-          default: 'Product description',
-        },
-        price: {
-          type: 'number',
-          default: 48.99,
-        },
-      },
-    },
-  })
   @ApiResponse({
     status: 201,
     description: 'Returns the generated prodcut id',
@@ -66,10 +49,10 @@ export class ProductsController {
   async addProduct(
     @Req() req,
     @Body()
-    body: { title: string; description: string; price: number; userId: string },
+    product: AddProductDto,
   ): Promise<{ id: string }> {
     const generatedId = await this.productsService.insertProduct(
-      body,
+      product,
       req.user.id,
     );
     return {
@@ -138,24 +121,6 @@ export class ProductsController {
     required: true,
     example: '60f70138d433b7396cead2d5',
   })
-  @ApiBody({
-    schema: {
-      properties: {
-        title: {
-          type: 'string',
-          default: 'Updated Product Title',
-        },
-        description: {
-          type: 'string',
-          default: 'Updated Product description',
-        },
-        price: {
-          type: 'number',
-          default: 99.99,
-        },
-      },
-    },
-  })
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
@@ -178,18 +143,14 @@ export class ProductsController {
     @Param('id') id: string,
     @Req() req,
     @Body()
-    body: {
-      title: string;
-      description: string;
-      price: number;
-    },
+    product: UpdateProductDto,
   ): Promise<{
     id: string;
     title: string;
     description: string;
     price: number;
   }> {
-    return this.productsService.updateProduct(id, body, req.user.id);
+    return this.productsService.updateProduct(id, product, req.user.id);
   }
 
   @Delete(':id')
