@@ -17,10 +17,7 @@ import { JwtAuthGuard } from '../auth/jwtAuth.guard';
 import {
   ApiTags,
   ApiOperation,
-  ApiOkResponse,
-  ApiBadRequestResponse,
-  ApiForbiddenResponse,
-  ApiUnauthorizedResponse,
+  ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EmailDto } from './email.dto';
@@ -37,11 +34,11 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Creates one user with email and password' })
-  @ApiOkResponse({
+  @ApiResponse({
     status: 201,
     description: 'Returns the successful created email',
   })
-  @ApiBadRequestResponse({
+  @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
   })
@@ -52,15 +49,15 @@ export class UsersController {
 
   @Post('/login')
   @ApiOperation({ summary: 'Return Json Web Token after login' })
-  @ApiOkResponse({
+  @ApiResponse({
     status: 201,
     description: 'Returns email and jwt',
   })
-  @ApiBadRequestResponse({
+  @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
   })
-  @ApiForbiddenResponse({
+  @ApiResponse({
     status: 403,
     description: 'Returns forbidden when password or email are incorrect',
   })
@@ -73,15 +70,15 @@ export class UsersController {
   @ApiOperation({
     summary: 'Reset password and return Json Web Token to set new password',
   })
-  @ApiOkResponse({
+  @ApiResponse({
     status: 201,
     description: 'Returns email and jwt',
   })
-  @ApiBadRequestResponse({
+  @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
   })
-  @ApiForbiddenResponse({
+  @ApiResponse({
     status: 403,
     description: 'Returns forbidden when email is incorrect',
   })
@@ -93,19 +90,19 @@ export class UsersController {
   @Put('/update-password')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Sets new password' })
-  @ApiOkResponse({
+  @ApiResponse({
     status: 200,
     description: 'Returns email when update password was successful',
   })
-  @ApiBadRequestResponse({
+  @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
   })
-  @ApiUnauthorizedResponse({
+  @ApiResponse({
     status: 401,
     description: 'Returns Unauthorized when jwt in header is invalid',
   })
-  @ApiForbiddenResponse({
+  @ApiResponse({
     status: 403,
     description: 'Returns forbidden when password is not empty',
   })
@@ -118,15 +115,15 @@ export class UsersController {
   @Put('/update-profile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update the profile information about the user' })
-  @ApiOkResponse({
+  @ApiResponse({
     status: 200,
     description: 'Returns profile information',
   })
-  @ApiBadRequestResponse({
+  @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
   })
-  @ApiUnauthorizedResponse({
+  @ApiResponse({
     status: 401,
     description: 'Returns Unauthorized when jwt in header is invalid',
   })
