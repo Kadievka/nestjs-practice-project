@@ -41,10 +41,22 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: 'Returns the successful created email',
+    schema: {
+      properties: {
+        email: { default: 'example@email.com' },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
+    schema: {
+      properties: {
+        statusCode: { default: 400 },
+        message: { default: '"confirmPassword" must be [ref:password]' },
+        error: { default: 'Bad Request' },
+      },
+    },
   })
   @UsePipes(new JoiValidationPipe(registerSchema))
   registerUser(@Body() user: RegisterDto): Promise<{ email: string }> {
@@ -56,14 +68,36 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: 'Returns email and jwt',
+    schema: {
+      properties: {
+        email: { default: 'example@email.com' },
+        jwt: {
+          default:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZW1haWwuY29tIiwic3ViIjoiNjBmZWU0MDI1MmIzZTEzMGI0ZDc4Yzk4IiwiaWF0IjoxNjI3MzE5NTkwfQ.U_1nYXAzauiCibtcEhOeUiGB6rTVHyandnu9m3ALTN0',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
+    schema: {
+      properties: {
+        statusCode: { default: 400 },
+        message: { default: '"email" must be a valid email' },
+        error: { default: 'Bad Request' },
+      },
+    },
   })
   @ApiResponse({
     status: 403,
     description: 'Returns forbidden when password or email are incorrect',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'Forbidden' },
+      },
+    },
   })
   @UsePipes(new JoiValidationPipe(loginSchema))
   login(@Body() user: LoginDto) {
@@ -77,14 +111,36 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: 'Returns email and jwt',
+    schema: {
+      properties: {
+        email: { default: 'example@email.com' },
+        jwt: {
+          default:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZW1haWwuY29tIiwic3ViIjoiNjBmZWU0MDI1MmIzZTEzMGI0ZDc4Yzk4IiwiaWF0IjoxNjI3MzE5NTkwfQ.U_1nYXAzauiCibtcEhOeUiGB6rTVHyandnu9m3ALTN0',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
+    schema: {
+      properties: {
+        statusCode: { default: 400 },
+        message: { default: '"email" must be a valid email' },
+        error: { default: 'Bad Request' },
+      },
+    },
   })
   @ApiResponse({
     status: 403,
     description: 'Returns forbidden when email is incorrect',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'Forbidden' },
+      },
+    },
   })
   @UsePipes(new JoiValidationPipe(emailSchema))
   sendJwtToResetPassword(@Body() user: EmailDto) {
@@ -97,18 +153,42 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Returns email when update password was successful',
+    schema: {
+      properties: {
+        email: { default: 'example@email.com' },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
+    schema: {
+      properties: {
+        statusCode: { default: 400 },
+        message: { default: '"email" must be a valid email' },
+        error: { default: 'Bad Request' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
   })
   @ApiResponse({
     status: 403,
     description: 'Returns forbidden when password is not empty',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'Forbidden' },
+      },
+    },
   })
   @UseGuards(JwtAuthGuard)
   @UsePipes(new JoiValidationPipe(resetPasswordSchema))
@@ -122,14 +202,35 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Returns profile information',
+    schema: {
+      properties: {
+        lastName: { default: 'Wick' },
+        firstName: { default: 'John' },
+        cellphone: { default: '+1 800 20 32' },
+        address: { default: 'street 21, 1. DF Utah' },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'Returns some message that validation failed',
+    schema: {
+      properties: {
+        statusCode: { default: 400 },
+        message: { default: '"firstName" must be a string' },
+        error: { default: 'Bad Request' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
   })
   @UseGuards(JwtAuthGuard)
   @UsePipes(new JoiValidationPipe(profileSchema))
@@ -147,14 +248,36 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Returns profile information',
+    schema: {
+      properties: {
+        email: { default: 'example@email.com' },
+        isAdmin: { default: false },
+        lastName: { default: 'Wick' },
+        firstName: { default: 'John' },
+        cellphone: { default: '+1 800 20 32' },
+        address: { default: 'street 21, 1. DF Utah' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
   })
   @ApiResponse({
     status: 403,
     description: 'Returns forbidden when user email is incorrect',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'Forbidden' },
+      },
+    },
   })
   @UseGuards(JwtAuthGuard)
   getProfile(@Req() req): Promise<{
@@ -172,15 +295,47 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Returns successful information',
+    schema: {
+      properties: {
+        docs: {
+          default: [
+            {
+              isAdmin: false,
+              _id: '60fee40252b3e130b4d78c98',
+              email: 'example@email.com',
+              createdAt: '2021-07-26T16:34:10.228Z',
+              updatedAt: '2021-07-26T17:23:32.398Z',
+            },
+          ],
+        },
+        total: { default: 1 },
+        limit: { default: 10 },
+        page: { default: 1 },
+        pages: { default: 1 },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
   })
   @ApiResponse({
     status: 403,
     description:
       'Returns forbidden when user email is incorrect or user is not admin',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'You are not allow to do this operation' },
+        error: { default: 'Forbidden' },
+      },
+    },
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
