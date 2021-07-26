@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Res } from '@nestjs/common';
+import welcomeTemplate from './templates/welcome';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags()
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @ApiOperation({ summary: 'Returns a html welcome page' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns welcome page with success',
+  })
+  getHello(@Res() res): string {
+    return res.send(welcomeTemplate);
   }
 }

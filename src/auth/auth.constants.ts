@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
+
 export const authConstants = {
-  secret: 'secret-string',
+  secret: process.env.JWT_SECRET,
 };
