@@ -21,6 +21,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { EmailDto } from './email.dto';
 import { ProfileDto } from './profile.dto';
@@ -338,6 +339,10 @@ export class UsersController {
     },
   })
   @ApiBearerAuth()
+  @ApiQuery({
+    name: 'page',
+    example: '1',
+  })
   @UseGuards(JwtAuthGuard)
   getAllUsersToManage(
     @Req() req,
