@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -27,6 +28,8 @@ import { RegisterDto } from './register.dto';
 import { LoginDto } from './login.dto';
 import { ResetPasswordDto } from './resetPassword.dto';
 import resetPasswordSchema from './resetPassword.schema';
+import { User } from './user.model';
+import { PaginateResult } from 'mongoose';
 
 @ApiTags('users')
 @Controller('users')
@@ -162,5 +165,29 @@ export class UsersController {
     address: string;
   }> {
     return this.userService.getUserProfile(req.user.email);
+  }
+
+  @Get('/manage')
+  @ApiOperation({ summary: 'Returns an array of not admin users' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns successful information',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns Unauthorized when jwt in header is invalid',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Returns forbidden when user email is incorrect or user is not admin',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  getAllUsersToManage(
+    @Req() req,
+    @Query('page') page,
+  ): Promise<PaginateResult<User>> {
+    return this.userService.getAllUsersToManage(req.user.email, page);
   }
 }

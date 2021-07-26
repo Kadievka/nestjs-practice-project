@@ -4,16 +4,17 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import userErrors from './user.errors';
 import { User } from './user.model';
 import { AuthService } from '../auth/auth.service';
+import { userConstants } from './user.constants';
+import { PaginateModel, PaginateResult } from 'mongoose';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly authService: AuthService,
-    @InjectModel('User') private readonly UserModel: Model<User>,
+    @InjectModel('User') private readonly UserModel: PaginateModel<User>,
   ) {}
 
   async findUserByEmail(email: string): Promise<User> {
@@ -91,6 +92,7 @@ export class UsersService {
 
   async getUserProfile(email: string): Promise<{
     email: string;
+    isAdmin: boolean;
     lastName: string;
     firstName: string;
     cellphone: string;
@@ -99,10 +101,47 @@ export class UsersService {
     const user = await this.findUserByEmailOrThrowForbidden(email);
     return {
       email: user.email,
+      isAdmin: user.isAdmin,
       lastName: user.lastName,
       firstName: user.firstName,
       cellphone: user.cellphone,
       address: user.address,
     };
+  }
+
+  async verifyIsAdmin(
+    email: string,
+    throwErrorIfIsNotAdmin: boolean,
+  ): Promise<boolean> {
+    const user = await this.findUserByEmailOrThrowForbidden(email);
+    if (!user.isAdmin && throwErrorIfIsNotAdmin) {
+      throw new ForbiddenException(userErrors.IS_NOT_ADMIN);
+    }
+    return user.isAdmin;
+  }
+
+  async getAllUsersToManage(
+    email: string,
+    page: string,
+  ): Promise<PaginateResult<User>> {
+    const throwErrorIfIsNotAdmin = true;
+    await this.verifyIsAdmin(email, throwErrorIfIsNotAdmin);
+
+    const query = {};
+
+    const options = {
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        isAdmin: true,
+      },
+      sort: { createdAt: -1 },
+      page: page ? parseInt(page) : 1,
+      limit: userConstants.DEFAULT_LIMIT_PER_PAGE,
+    };
+
+    return this.UserModel.paginate(query, options);
   }
 }
