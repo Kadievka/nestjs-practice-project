@@ -9,6 +9,7 @@ import {
   UseGuards,
   UsePipes,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { registerSchema } from './register.schema';
@@ -357,7 +358,7 @@ export class UsersController {
     return this.userService.getAllUsersToManage(req.user.email, page);
   }
 
-  @Put('/manage/ban/:userEmail')
+  @Put('/manage-ban/:userEmail')
   @ApiParam({
     name: 'userEmail',
     example: 'example1@mail.com',
@@ -366,7 +367,7 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
-    description: 'Returns user banned',
+    description: 'Returns banned user email',
     schema: {
       properties: {
         email: { default: 'example1@mail.com' },
@@ -411,5 +412,59 @@ export class UsersController {
     @Param('userEmail') userEmail: string,
   ): Promise<EmailDto> {
     return this.userService.banUser(req.user.email, userEmail);
+  }
+
+  @Delete('/manage-delete/:userEmail')
+  @ApiParam({
+    name: 'userEmail',
+    example: 'example1@mail.com',
+  })
+  @ApiOperation({ summary: 'Admin user can delete another not admin user' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Returns deleted user email',
+    schema: {
+      properties: {
+        email: { default: 'example1@mail.com' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Returns forbidden when user to delete is admin',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'Forbidden' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Returns not found exception',
+    schema: {
+      properties: {
+        statusCode: { default: 404 },
+        message: { default: 'Not Found' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard)
+  deleteUser(
+    @Req() req,
+    @Param('userEmail') userEmail: string,
+  ): Promise<EmailDto> {
+    return this.userService.deleteUser(req.user.email, userEmail);
   }
 }

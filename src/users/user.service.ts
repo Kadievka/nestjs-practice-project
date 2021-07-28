@@ -153,7 +153,7 @@ export class UsersService {
     return this.UserModel.paginate(query, options);
   }
 
-  async banUser(adminEmail: string, userEmail: string): Promise<EmailDto> {
+  async findUserByEmailToManage(adminEmail: string, userEmail: string) {
     await this.verifyIsAdmin(adminEmail, true);
     const userToBan = await this.findUserByEmail(userEmail);
     if (!userToBan) {
@@ -162,11 +162,22 @@ export class UsersService {
     if (userToBan.isAdmin) {
       throw new ForbiddenException();
     }
+    return userToBan;
+  }
+
+  async banUser(adminEmail: string, userEmail: string): Promise<EmailDto> {
+    const userToBan = await this.findUserByEmailToManage(adminEmail, userEmail);
     if (userToBan.isBanned) {
       throw new ForbiddenException(userErrors.ALREADY_BANNED);
     }
     userToBan.isBanned = true;
     await userToBan.save();
+    return { email: userToBan.email };
+  }
+
+  async deleteUser(adminEmail: string, userEmail: string): Promise<EmailDto> {
+    const userToBan = await this.findUserByEmailToManage(adminEmail, userEmail);
+    await this.UserModel.findByIdAndDelete(userToBan.id);
     return { email: userToBan.email };
   }
 }
