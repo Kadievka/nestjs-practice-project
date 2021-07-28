@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import userErrors from './user.errors';
@@ -9,6 +10,7 @@ import { User } from './user.model';
 import { AuthService } from '../auth/auth.service';
 import { userConstants } from './user.constants';
 import { PaginateModel, PaginateResult } from 'mongoose';
+import { EmailDto } from './email.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +34,7 @@ export class UsersService {
   async registerUser(user: {
     email: string;
     password: string;
-  }): Promise<{ email: string }> {
+  }): Promise<EmailDto> {
     const foundUser = await this.findUserByEmail(user.email);
     if (foundUser) {
       throw new BadRequestException(userErrors.EMAIL_ALREADY_EXIST);
@@ -46,6 +48,9 @@ export class UsersService {
     password: string;
   }): Promise<{ email: string; jwt: string }> {
     const foundUser = await this.findUserByEmailOrThrowForbidden(user.email);
+    if (foundUser.isBanned) {
+      throw new ForbiddenException(userErrors.ALREADY_BANNED);
+    }
     const valid = await foundUser.verifyPassword(user.password);
     if (!valid) {
       throw new ForbiddenException();
@@ -60,7 +65,7 @@ export class UsersService {
     return this.authService.sendJWT(user.id, user.email);
   }
 
-  async updatePassword(request, email): Promise<{ email: string }> {
+  async updatePassword(request, email): Promise<EmailDto> {
     const foundUser = await this.findUserByEmailOrThrowForbidden(email);
     if (foundUser.password) {
       throw new ForbiddenException(userErrors.ALREADY_HAVE_PASSWORD);
@@ -127,7 +132,9 @@ export class UsersService {
     const throwErrorIfIsNotAdmin = true;
     await this.verifyIsAdmin(email, throwErrorIfIsNotAdmin);
 
-    const query = {};
+    const query = {
+      email: { $ne: email },
+    };
 
     const options = {
       select: {
@@ -136,6 +143,7 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
         isAdmin: true,
+        isBanned: true,
       },
       sort: { createdAt: -1 },
       page: page ? parseInt(page) : 1,
@@ -143,5 +151,22 @@ export class UsersService {
     };
 
     return this.UserModel.paginate(query, options);
+  }
+
+  async banUser(adminEmail: string, userEmail: string): Promise<EmailDto> {
+    await this.verifyIsAdmin(adminEmail, true);
+    const userToBan = await this.findUserByEmail(userEmail);
+    if (!userToBan) {
+      throw new NotFoundException();
+    }
+    if (userToBan.isAdmin) {
+      throw new ForbiddenException();
+    }
+    if (userToBan.isBanned) {
+      throw new ForbiddenException(userErrors.ALREADY_BANNED);
+    }
+    userToBan.isBanned = true;
+    await userToBan.save();
+    return { email: userToBan.email };
   }
 }

@@ -8,13 +8,14 @@ import {
   Req,
   UseGuards,
   UsePipes,
+  Param,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
-import registerSchema from './register.schema';
+import { registerSchema } from './register.schema';
 import { JoiValidationPipe } from '../pipes/joi.validation.pipe';
-import loginSchema from './login.schema';
-import emailSchema from './email.schema';
-import profileSchema from './profile.schema';
+import { loginSchema } from './login.schema';
+import { emailSchema } from './email.schema';
+import { profileSchema } from './profile.schema';
 import { JwtAuthGuard } from '../auth/jwtAuth.guard';
 import {
   ApiTags,
@@ -22,6 +23,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import { EmailDto } from './email.dto';
 import { ProfileDto } from './profile.dto';
@@ -31,6 +33,7 @@ import { ResetPasswordDto } from './resetPassword.dto';
 import resetPasswordSchema from './resetPassword.schema';
 import { User } from './user.model';
 import { PaginateResult } from 'mongoose';
+import userErrors from './user.errors';
 
 @ApiTags('users')
 @Controller('users')
@@ -60,7 +63,7 @@ export class UsersController {
     },
   })
   @UsePipes(new JoiValidationPipe(registerSchema))
-  registerUser(@Body() user: RegisterDto): Promise<{ email: string }> {
+  registerUser(@Body() user: RegisterDto): Promise<EmailDto> {
     return this.userService.registerUser(user);
   }
 
@@ -92,11 +95,13 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Returns forbidden when password or email are incorrect',
+    description:
+      'Returns forbidden when password or email are incorrect, or the user is banned',
     schema: {
       properties: {
         statusCode: { default: 403 },
-        message: { default: 'Forbidden' },
+        message: { default: userErrors.ALREADY_BANNED },
+        error: { default: 'Forbidden' },
       },
     },
   })
@@ -197,7 +202,7 @@ export class UsersController {
     return this.userService.updatePassword(passwordRequest, req.user.email);
   }
 
-  @Put('/update-profile')
+  @Put('/profile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update the profile information about the user' })
   @ApiResponse({
@@ -292,7 +297,7 @@ export class UsersController {
   }
 
   @Get('/manage')
-  @ApiOperation({ summary: 'Returns an array of not admin users' })
+  @ApiOperation({ summary: 'Returns an array of all users' })
   @ApiResponse({
     status: 200,
     description: 'Returns successful information',
@@ -302,6 +307,7 @@ export class UsersController {
           default: [
             {
               isAdmin: false,
+              isBanned: false,
               _id: '60fee40252b3e130b4d78c98',
               email: 'example@email.com',
               createdAt: '2021-07-26T16:34:10.228Z',
@@ -349,5 +355,61 @@ export class UsersController {
     @Query('page') page,
   ): Promise<PaginateResult<User>> {
     return this.userService.getAllUsersToManage(req.user.email, page);
+  }
+
+  @Put('/manage/ban/:userEmail')
+  @ApiParam({
+    name: 'userEmail',
+    example: 'example1@mail.com',
+  })
+  @ApiOperation({ summary: 'Admin user can ban another not admin user' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Returns user banned',
+    schema: {
+      properties: {
+        email: { default: 'example1@mail.com' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Returns forbidden when user to ban is admin or is already banned',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: userErrors.ALREADY_BANNED },
+        error: { default: 'Forbidden' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Returns not found exception',
+    schema: {
+      properties: {
+        statusCode: { default: 404 },
+        message: { default: 'Not Found' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard)
+  banUser(
+    @Req() req,
+    @Param('userEmail') userEmail: string,
+  ): Promise<EmailDto> {
+    return this.userService.banUser(req.user.email, userEmail);
   }
 }

@@ -6,4 +6,4 @@ const registerSchema = Joi.object({
   confirmPassword: Joi.string().min(8).required().valid(Joi.ref('password')),
 });
 
-export default registerSchema;
+export { registerSchema };

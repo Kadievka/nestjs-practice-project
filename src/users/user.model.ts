@@ -16,6 +16,10 @@ export const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
     firstName: String,
     lastName: String,
     cellphone: String,
@@ -33,6 +37,7 @@ export interface User extends mongoose.Document {
   email: string;
   password: string;
   isAdmin: boolean;
+  isBanned: boolean;
   firstName: string;
   lastName: string;
   cellphone: string;

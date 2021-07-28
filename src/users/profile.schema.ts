@@ -7,4 +7,4 @@ const profileSchema = Joi.object({
   address: Joi.string().optional().allow(''),
 });
 
-export default profileSchema;
+export { profileSchema };

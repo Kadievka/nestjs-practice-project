@@ -5,4 +5,4 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-export default loginSchema;
+export { loginSchema };
