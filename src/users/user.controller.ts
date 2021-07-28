@@ -297,8 +297,8 @@ export class UsersController {
     return this.userService.getUserProfile(req.user.email);
   }
 
-  @Get('/manage')
-  @ApiOperation({ summary: 'Returns an array of all users' })
+  @Get('/manage-get-all')
+  @ApiOperation({ summary: 'Returns all users paginated' })
   @ApiResponse({
     status: 200,
     description: 'Returns successful information',
@@ -356,6 +356,67 @@ export class UsersController {
     @Query('page') page,
   ): Promise<PaginateResult<User>> {
     return this.userService.getAllUsersToManage(req.user.email, page);
+  }
+
+  @Get('/manage-get-banned')
+  @ApiOperation({ summary: 'Returns only banned users paginated' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns successful information',
+    schema: {
+      properties: {
+        docs: {
+          default: [
+            {
+              isAdmin: false,
+              isBanned: true,
+              _id: '60fee40252b3e130b4d78c98',
+              email: 'example@email.com',
+              createdAt: '2021-07-26T16:34:10.228Z',
+              updatedAt: '2021-07-26T17:23:32.398Z',
+            },
+          ],
+        },
+        total: { default: 1 },
+        limit: { default: 10 },
+        page: { default: 1 },
+        pages: { default: 1 },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Returns forbidden when user email is incorrect or user is not admin',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: 'You are not allow to do this operation' },
+        error: { default: 'Forbidden' },
+      },
+    },
+  })
+  @ApiBearerAuth()
+  @ApiQuery({
+    name: 'page',
+    example: '1',
+  })
+  @UseGuards(JwtAuthGuard)
+  getBannedUsersToManage(
+    @Req() req,
+    @Query('page') page,
+  ): Promise<PaginateResult<User>> {
+    return this.userService.getBannedUsersToManage(req.user.email, page);
   }
 
   @Put('/manage-ban/:userEmail')

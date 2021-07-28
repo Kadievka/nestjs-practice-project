@@ -19,6 +19,15 @@ export class UsersService {
     @InjectModel('User') private readonly UserModel: PaginateModel<User>,
   ) {}
 
+  userIndexSelectFields = {
+    id: true,
+    email: true,
+    createdAt: true,
+    updatedAt: true,
+    isAdmin: true,
+    isBanned: true,
+  };
+
   async findUserByEmail(email: string): Promise<User> {
     return this.UserModel.findOne({ email: email });
   }
@@ -137,14 +146,28 @@ export class UsersService {
     };
 
     const options = {
-      select: {
-        id: true,
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-        isAdmin: true,
-        isBanned: true,
-      },
+      select: this.userIndexSelectFields,
+      sort: { createdAt: -1 },
+      page: page ? parseInt(page) : 1,
+      limit: userConstants.DEFAULT_LIMIT_PER_PAGE,
+    };
+
+    return this.UserModel.paginate(query, options);
+  }
+
+  async getBannedUsersToManage(
+    email: string,
+    page: string,
+  ): Promise<PaginateResult<User>> {
+    await this.verifyIsAdmin(email, true);
+
+    const query = {
+      email: { $ne: email },
+      isBanned: true,
+    };
+
+    const options = {
+      select: this.userIndexSelectFields,
       sort: { createdAt: -1 },
       page: page ? parseInt(page) : 1,
       limit: userConstants.DEFAULT_LIMIT_PER_PAGE,
