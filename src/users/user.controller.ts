@@ -12,11 +12,11 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
-import { registerSchema } from './register.schema';
+import { registerSchema } from './schemas/register.schema';
 import { JoiValidationPipe } from '../pipes/joi.validation.pipe';
-import { loginSchema } from './login.schema';
-import { emailSchema } from './email.schema';
-import { profileSchema } from './profile.schema';
+import { loginSchema } from './schemas/login.schema';
+import { emailSchema } from './schemas/email.schema';
+import { profileSchema } from './schemas/profile.schema';
 import { JwtAuthGuard } from '../auth/jwtAuth.guard';
 import {
   ApiTags,
@@ -26,12 +26,12 @@ import {
   ApiQuery,
   ApiParam,
 } from '@nestjs/swagger';
-import { EmailDto } from './email.dto';
-import { ProfileDto } from './profile.dto';
-import { RegisterDto } from './register.dto';
-import { LoginDto } from './login.dto';
-import { ResetPasswordDto } from './resetPassword.dto';
-import resetPasswordSchema from './resetPassword.schema';
+import { EmailDto } from './dtos/email.dto';
+import { ProfileDto } from './dtos/profile.dto';
+import { RegisterDto } from './dtos/register.dto';
+import { LoginDto } from './dtos/login.dto';
+import { ResetPasswordDto } from './dtos/resetPassword.dto';
+import resetPasswordSchema from './schemas/resetPassword.schema';
 import { User } from './user.model';
 import { PaginateResult } from 'mongoose';
 import userErrors from './user.errors';

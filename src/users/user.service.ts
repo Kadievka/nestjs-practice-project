@@ -10,7 +10,7 @@ import { User } from './user.model';
 import { AuthService } from '../auth/auth.service';
 import { userConstants } from './user.constants';
 import { PaginateModel, PaginateResult } from 'mongoose';
-import { EmailDto } from './email.dto';
+import { EmailDto } from './dtos/email.dto';
 
 @Injectable()
 export class UsersService {
