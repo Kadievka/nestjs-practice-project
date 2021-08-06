@@ -90,6 +90,7 @@ export class UsersController {
   })
   @ApiQuery({
     name: 'numberOfUsers',
+    required: false,
     example: '1',
   })
   getRandomUsers(@Query('numberOfUsers') numberOfUsers: string): User[] {
