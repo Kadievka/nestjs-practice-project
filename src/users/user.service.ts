@@ -11,11 +11,13 @@ import { AuthService } from '../auth/auth.service';
 import { userConstants } from './user.constants';
 import { PaginateModel, PaginateResult } from 'mongoose';
 import { EmailDto } from './dtos/email.dto';
+import { RandomService } from '../random/random.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly authService: AuthService,
+    private readonly randomService: RandomService,
     @InjectModel('User') private readonly UserModel: PaginateModel<User>,
   ) {}
 
@@ -27,6 +29,16 @@ export class UsersService {
     isAdmin: true,
     isBanned: true,
   };
+
+  getRandomUsers(numberOfUsers = 100): User[] {
+    const users = [];
+    for (let i = 1; i <= numberOfUsers; i++) {
+      const user = this.randomService.getUser();
+      user.id = `${i}`;
+      users.push(user);
+    }
+    return users;
+  }
 
   async findUserByEmail(email: string): Promise<User> {
     return this.UserModel.findOne({ email: email });
