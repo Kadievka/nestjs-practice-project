@@ -41,34 +41,6 @@ import userErrors from './user.errors';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Get('/get-random-users')
-  @ApiOperation({
-    summary: "Returns a list of radom fake users, you don't need to login",
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns array of fake users',
-    schema: {
-      type: 'array',
-      items: {
-        example: {
-          id: '1',
-          firstName: 'Paul',
-          lastName: 'Thompson',
-          email: 'roger_await415@uno.com',
-          password: '22309215.cyan!279',
-        },
-      },
-    },
-  })
-  @ApiQuery({
-    name: 'numberOfUsers',
-    example: '1',
-  })
-  getRandomUsers(@Query('numberOfUsers') numberOfUsers: string): User[] {
-    return this.userService.getRandomUsers(parseInt(numberOfUsers));
-  }
-
   @Post()
   @ApiOperation({ summary: 'Creates one user with email and password' })
   @ApiResponse({
@@ -94,6 +66,34 @@ export class UsersController {
   @UsePipes(new JoiValidationPipe(registerSchema))
   registerUser(@Body() user: RegisterDto): Promise<EmailDto> {
     return this.userService.registerUser(user);
+  }
+
+  @Get('/get-random-users')
+  @ApiOperation({
+    summary: "Returns a list of radom fake users, you don't need to login",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns array of fake users',
+    schema: {
+      type: 'array',
+      items: {
+        example: {
+          id: '1',
+          firstName: 'Paul',
+          lastName: 'Thompson',
+          email: 'roger_await415@uno.com',
+          password: '22309215.cyan!279',
+        },
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'numberOfUsers',
+    example: '1',
+  })
+  getRandomUsers(@Query('numberOfUsers') numberOfUsers: string): User[] {
+    return this.userService.getRandomUsers(numberOfUsers);
   }
 
   @Post('/login')

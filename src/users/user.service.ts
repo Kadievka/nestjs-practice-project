@@ -30,9 +30,13 @@ export class UsersService {
     isBanned: true,
   };
 
-  getRandomUsers(numberOfUsers = 100): User[] {
+  getRandomUsers(numberOfUsers: string): User[] {
+    let number = 100;
+    if (numberOfUsers) {
+      number = parseInt(numberOfUsers);
+    }
     const users = [];
-    for (let i = 1; i <= numberOfUsers; i++) {
+    for (let i = 1; i <= number; i++) {
       const user = this.randomService.getUser();
       user.id = `${i}`;
       users.push(user);
