@@ -30,6 +30,10 @@ export class UsersService {
     isBanned: true,
   };
 
+  getRandomUser() {
+    return this.randomService.getUser();
+  }
+
   getRandomUsers(numberOfUsers: string): User[] {
     let number = 100;
     if (numberOfUsers) {

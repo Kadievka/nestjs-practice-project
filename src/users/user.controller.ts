@@ -68,6 +68,27 @@ export class UsersController {
     return this.userService.registerUser(user);
   }
 
+  @Get('/get-random-user')
+  @ApiOperation({
+    summary: "Returns one fake user, you don't need to login",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns one fake user',
+    schema: {
+      properties: {
+        id: { default: '1' },
+        firstName: { default: 'Paul' },
+        lastName: { default: 'Thompson' },
+        email: { default: 'roger_await415@uno.com' },
+        password: { default: '22309215.cyan!279' },
+      },
+    },
+  })
+  getRandomUser() {
+    return this.userService.getRandomUser();
+  }
+
   @Get('/get-random-users')
   @ApiOperation({
     summary: "Returns a list of radom fake users, you don't need to login",
@@ -91,7 +112,7 @@ export class UsersController {
   @ApiQuery({
     name: 'numberOfUsers',
     required: false,
-    example: '1',
+    example: '10',
   })
   getRandomUsers(@Query('numberOfUsers') numberOfUsers: string): User[] {
     return this.userService.getRandomUsers(numberOfUsers);

@@ -36,7 +36,7 @@ export class RandomService {
     )}.${this.getOne().color()}!${this.randomNumber(1000)}`;
 
   public getUser = () => ({
-    id: '',
+    id: `1${this.randomNumber(100)}`,
     firstName: this.getOne().firstName(),
     lastName: this.getOne().lastName(),
     email: this.getEmail(),
