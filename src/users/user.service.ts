@@ -34,7 +34,7 @@ export class UsersService {
     return this.randomService.getUser();
   }
 
-  getRandomUsers(numberOfUsers: string): User[] {
+  getRandomUsers(numberOfUsers?: string): User[] {
     let number = 100;
     if (numberOfUsers) {
       number = parseInt(numberOfUsers);
@@ -75,7 +75,7 @@ export class UsersService {
   async login(user: {
     email: string;
     password: string;
-  }): Promise<{ email: string; jwt: string }> {
+  }): Promise<{ isAdmin: boolean; email: string; jwt: string }> {
     const foundUser = await this.findUserByEmailOrThrowForbidden(user.email);
     if (foundUser.isBanned) {
       throw new ForbiddenException(userErrors.ALREADY_BANNED);
@@ -84,14 +84,18 @@ export class UsersService {
     if (!valid) {
       throw new ForbiddenException();
     }
-    return this.authService.sendJWT(foundUser.id, foundUser.email);
+    return this.authService.sendJWT(
+      foundUser.id,
+      foundUser.email,
+      foundUser.isAdmin,
+    );
   }
 
   async sendJwtToResetPassword(email): Promise<{ email: string; jwt: string }> {
     const user = await this.findUserByEmailOrThrowForbidden(email);
     user.password = null;
     await user.save();
-    return this.authService.sendJWT(user.id, user.email);
+    return this.authService.sendJWT(user.id, user.email, user.isAdmin);
   }
 
   async updatePassword(request, email): Promise<EmailDto> {
@@ -154,25 +158,15 @@ export class UsersService {
     return user.isAdmin;
   }
 
-  async getAllUsersToManage(
-    email: string,
-    page: string,
-  ): Promise<PaginateResult<User>> {
-    const throwErrorIfIsNotAdmin = true;
-    await this.verifyIsAdmin(email, throwErrorIfIsNotAdmin);
-
-    const query = {
-      email: { $ne: email },
-    };
-
-    const options = {
-      select: this.userIndexSelectFields,
-      sort: { createdAt: -1 },
-      page: page ? parseInt(page) : 1,
-      limit: userConstants.DEFAULT_LIMIT_PER_PAGE,
-    };
-
-    return this.UserModel.paginate(query, options);
+  async getAllUsersToManage(email: string): Promise<User[]> {
+    const throwErrorIfIsNotAdmin = false;
+    if (await this.verifyIsAdmin(email, throwErrorIfIsNotAdmin)) {
+      let users = await this.UserModel.find();
+      users = users.filter((user) => user.email !== email);
+      return users;
+    } else {
+      return this.getRandomUsers();
+    }
   }
 
   async getBannedUsersToManage(

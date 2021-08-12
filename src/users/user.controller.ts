@@ -122,7 +122,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Return Json Web Token after login' })
   @ApiResponse({
     status: 201,
-    description: 'Returns email and jwt',
+    description: 'Returns email, isAdmin and jwt',
     schema: {
       properties: {
         email: { default: 'example@email.com' },
@@ -348,7 +348,10 @@ export class UsersController {
   }
 
   @Get('/manage-get-all')
-  @ApiOperation({ summary: 'Returns all users paginated' })
+  @ApiOperation({
+    summary:
+      'If user isAdmin, returns all actual users, but if user is not admin, returns fake users',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns successful information',
@@ -385,8 +388,7 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description:
-      'Returns forbidden when user email is incorrect or user is not admin',
+    description: 'Returns forbidden when user email is incorrect',
     schema: {
       properties: {
         statusCode: { default: 403 },
@@ -396,16 +398,9 @@ export class UsersController {
     },
   })
   @ApiBearerAuth()
-  @ApiQuery({
-    name: 'page',
-    example: '1',
-  })
   @UseGuards(JwtAuthGuard)
-  getAllUsersToManage(
-    @Req() req,
-    @Query('page') page,
-  ): Promise<PaginateResult<User>> {
-    return this.userService.getAllUsersToManage(req.user.email, page);
+  getAllUsersToManage(@Req() req): Promise<User[]> {
+    return this.userService.getAllUsersToManage(req.user.email);
   }
 
   @Get('/manage-get-banned')
