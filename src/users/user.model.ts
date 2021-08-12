@@ -44,5 +44,5 @@ export interface User extends mongoose.Document {
   address: string;
   createdAt: string;
   updatedAt: string;
-  verifyPassword;
+  verifyPassword?;
 }

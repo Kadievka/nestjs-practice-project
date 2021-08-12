@@ -161,9 +161,10 @@ export class UsersService {
   async getAllUsersToManage(email: string): Promise<User[]> {
     const throwErrorIfIsNotAdmin = false;
     if (await this.verifyIsAdmin(email, throwErrorIfIsNotAdmin)) {
-      let users = await this.UserModel.find();
-      users = users.filter((user) => user.email !== email);
-      return users;
+      const users = await this.UserModel.find().select({
+        password: false,
+      });
+      return users.filter((user) => user.email !== email);
     } else {
       return this.getRandomUsers();
     }
