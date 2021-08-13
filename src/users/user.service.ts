@@ -63,6 +63,8 @@ export class UsersService {
   async registerUser(user: {
     email: string;
     password: string;
+    firstName?: string;
+    lastName?: string;
   }): Promise<EmailDto> {
     const foundUser = await this.findUserByEmail(user.email);
     if (foundUser) {
