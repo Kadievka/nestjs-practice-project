@@ -215,6 +215,16 @@ export class UsersService {
     return { email: userToBan.email };
   }
 
+  async removeBan(adminEmail: string, userEmail: string): Promise<EmailDto> {
+    const userToBan = await this.findUserByEmailToManage(adminEmail, userEmail);
+    if (!userToBan.isBanned) {
+      throw new ForbiddenException(userErrors.IS_NOT_BANNED);
+    }
+    userToBan.isBanned = false;
+    await userToBan.save();
+    return { email: userToBan.email };
+  }
+
   async deleteUser(adminEmail: string, userEmail: string): Promise<EmailDto> {
     const userToBan = await this.findUserByEmailToManage(adminEmail, userEmail);
     await this.UserModel.findByIdAndDelete(userToBan.id);

@@ -492,8 +492,7 @@ export class UsersController {
   })
   @ApiResponse({
     status: 403,
-    description:
-      'Returns forbidden when user to ban is admin or is already banned',
+    description: 'Returns forbidden when user to ban is already banned',
     schema: {
       properties: {
         statusCode: { default: 403 },
@@ -518,6 +517,63 @@ export class UsersController {
     @Param('userEmail') userEmail: string,
   ): Promise<EmailDto> {
     return this.userService.banUser(req.user.email, userEmail);
+  }
+
+  @Put('/manage-remove-ban/:userEmail')
+  @ApiParam({
+    name: 'userEmail',
+    example: 'example1@mail.com',
+  })
+  @ApiOperation({
+    summary: 'Admin user can remove the ban in another not admin user',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Returns removed ban user email',
+    schema: {
+      properties: {
+        email: { default: 'example1@mail.com' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Returns Unauthorized when jwt in header is invalid',
+    schema: {
+      properties: {
+        statusCode: { default: 401 },
+        message: { default: 'Unauthorized' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Returns forbidden when user to remove ban in not banned',
+    schema: {
+      properties: {
+        statusCode: { default: 403 },
+        message: { default: userErrors.ALREADY_BANNED },
+        error: { default: 'Forbidden' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Returns not found exception',
+    schema: {
+      properties: {
+        statusCode: { default: 404 },
+        message: { default: 'Not Found' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard)
+  removeBan(
+    @Req() req,
+    @Param('userEmail') userEmail: string,
+  ): Promise<EmailDto> {
+    return this.userService.removeBan(req.user.email, userEmail);
   }
 
   @Delete('/manage-delete/:userEmail')
