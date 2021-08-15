@@ -12,6 +12,11 @@ export const UserSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    nickname: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     isAdmin: {
       type: Boolean,
       default: false,
@@ -35,6 +40,7 @@ UserSchema.plugin(mongoosePaginate);
 export interface User extends mongoose.Document {
   id: string;
   email: string;
+  nickname: string;
   password: string;
   isAdmin: boolean;
   isBanned: boolean;

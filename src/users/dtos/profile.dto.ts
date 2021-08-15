@@ -3,6 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ProfileDto {
   @ApiProperty({
     type: String,
+    description: 'user nickname',
+    default: 'wickjb12',
+  })
+  nickname: string;
+
+  @ApiProperty({
+    type: String,
     description: 'user first name',
     default: 'John',
   })

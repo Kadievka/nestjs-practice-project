@@ -261,6 +261,7 @@ export class UsersController {
     description: 'Returns profile information',
     schema: {
       properties: {
+        nickNAme: { default: 'wickjb12' },
         lastName: { default: 'Wick' },
         firstName: { default: 'John' },
         cellphone: { default: '+1 800 20 32' },
@@ -308,6 +309,7 @@ export class UsersController {
     schema: {
       properties: {
         email: { default: 'example@email.com' },
+        nickname: { default: 'wickjb12' },
         isAdmin: { default: false },
         lastName: { default: 'Wick' },
         firstName: { default: 'John' },
@@ -339,6 +341,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   getProfile(@Req() req): Promise<{
     email: string;
+    nickname: string;
     lastName: string;
     firstName: string;
     cellphone: string;

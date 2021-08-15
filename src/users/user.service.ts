@@ -70,8 +70,25 @@ export class UsersService {
     if (foundUser) {
       throw new BadRequestException(userErrors.EMAIL_ALREADY_EXIST);
     }
-    const createdUser = await this.UserModel.create(user);
+    const newUser = new this.UserModel(user);
+    newUser.nickname = await this.createNickName(user.email);
+    const createdUser = await this.UserModel.create(newUser);
     return { email: createdUser.email };
+  }
+
+  async findUserByNickName(nickname: string): Promise<User> {
+    return this.UserModel.findOne({ nickname: nickname });
+  }
+
+  async createNickName(email: string): Promise<any> {
+    let counter = 0;
+    let nickname = email.split('@')[0];
+    if (!(await this.findUserByNickName(nickname))) {
+      return nickname;
+    }
+    counter += 1;
+    nickname = `${nickname}${counter}`;
+    return this.createNickName(nickname);
   }
 
   async login(user: {
@@ -110,9 +127,26 @@ export class UsersService {
     return { email: foundUser.email };
   }
 
+  async validateNickname(
+    nickname: string,
+    currentNickname: string,
+  ): Promise<string> {
+    if (!nickname) {
+      return currentNickname;
+    }
+    if (
+      (await this.findUserByNickName(nickname)) &&
+      nickname !== currentNickname
+    ) {
+      throw new BadRequestException(userErrors.NICKNAME_ALREADY_EXIST);
+    }
+    return nickname;
+  }
+
   async updateProfile(
     email: string,
     information: {
+      nickname: string;
       firstName: string;
       lastName: string;
       cellphone: string;
@@ -120,9 +154,14 @@ export class UsersService {
     },
   ) {
     const user = await this.findUserByEmailOrThrowForbidden(email);
+    information.nickname = await this.validateNickname(
+      information.nickname,
+      user.nickname,
+    );
     Object.assign(user, information);
     await user.save();
     return {
+      nickname: user.nickname,
       lastName: user.lastName,
       firstName: user.firstName,
       cellphone: user.cellphone,
@@ -132,6 +171,7 @@ export class UsersService {
 
   async getUserProfile(email: string): Promise<{
     email: string;
+    nickname: string;
     isAdmin: boolean;
     lastName: string;
     firstName: string;
@@ -141,6 +181,7 @@ export class UsersService {
     const user = await this.findUserByEmailOrThrowForbidden(email);
     return {
       email: user.email,
+      nickname: user.nickname,
       isAdmin: user.isAdmin,
       lastName: user.lastName,
       firstName: user.firstName,

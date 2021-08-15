@@ -1,5 +1,6 @@
 const userErrors = {
   EMAIL_ALREADY_EXIST: 'Email already exists',
+  NICKNAME_ALREADY_EXIST: 'Nickname already exists',
   ALREADY_HAVE_PASSWORD: 'You already have a password',
   IS_NOT_ADMIN: 'You are not allow to do this operation',
   ALREADY_BANNED: 'This user is already banned',
