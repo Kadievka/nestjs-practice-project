@@ -29,7 +29,6 @@ import {
 } from '@nestjs/swagger';
 import { EmailDto } from './dtos/email.dto';
 import { ProfileDto } from './dtos/profile.dto';
-import { ProfilePhotoDto } from './dtos/profilePhoto.dto';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
@@ -37,6 +36,7 @@ import resetPasswordSchema from './schemas/resetPassword.schema';
 import { User } from './user.model';
 import { PaginateResult } from 'mongoose';
 import userErrors from './user.errors';
+import { Image } from 'src/images/image.model';
 
 @ApiTags('users')
 @Controller('users')
@@ -357,7 +357,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Uploads an user profile photo' })
   @UseGuards(JwtAuthGuard)
   @UsePipes(new JoiValidationPipe(profilePhotoSchema))
-  uploadProfilePhoto(@Req() req, @Body() body: ProfilePhotoDto) {
+  uploadProfilePhoto(@Req() req, @Body() body: Image) {
     return this.userService.uploadProfilePhoto(req.user.email, body);
   }
 

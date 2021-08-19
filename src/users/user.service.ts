@@ -12,7 +12,8 @@ import { userConstants } from './user.constants';
 import { PaginateModel, PaginateResult } from 'mongoose';
 import { EmailDto } from './dtos/email.dto';
 import { RandomService } from '../random/random.service';
-import { ProfilePhotoDto } from './dtos/profilePhoto.dto';
+import { ImagesService } from 'src/images/images.service';
+import { Image } from 'src/images/image.model';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,10 @@ export class UsersService {
     private readonly authService: AuthService,
     private readonly randomService: RandomService,
     @InjectModel('User') private readonly UserModel: PaginateModel<User>,
+    private imagesService: ImagesService,
   ) {}
+
+  moduleName = 'USERS';
 
   userIndexSelectFields = {
     id: true,
@@ -170,11 +174,18 @@ export class UsersService {
     };
   }
 
-  async uploadProfilePhoto(email: string, body: ProfilePhotoDto) {
+  async uploadProfilePhoto(email: string, body: Image) {
     const user = await this.findUserByEmailOrThrowForbidden(email);
-    console.log(user);
-    console.log(body);
-    //TODO file service to save image
+    const storedImage = await this.imagesService.saveImageProcess(
+      body,
+      this.moduleName,
+    );
+    user.profilePhotoId = storedImage._id;
+    user.profilePhotoName = storedImage.name;
+    user.profilePhotoType = storedImage.type;
+    user.profilePhotoSize = storedImage.size;
+    user.profilePhotoPath = storedImage.path;
+    await user.save();
     return user;
   }
 
