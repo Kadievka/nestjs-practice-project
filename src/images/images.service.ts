@@ -75,4 +75,14 @@ export class ImagesService {
       return false;
     }
   }
+
+  async deleteImage(imagepath): Promise<string> {
+    // /uploads/USERS/RUbFSpTXb3RZ0Fi.jpeg
+    await this.ImageModel.findOneAndDelete({ path: imagepath });
+    const path = `${this.absolutePath}/public/${imagepath}`;
+    if (await this.checkFileExists) {
+      await fs.promises.unlink(path);
+    }
+    return path;
+  }
 }

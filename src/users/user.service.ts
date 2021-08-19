@@ -183,6 +183,9 @@ export class UsersService {
 
   async uploadProfilePhoto(email: string, body: Image) {
     const user = await this.findUserByEmailOrThrowForbidden(email);
+    if (user.profilePhotoPath) {
+      await this.imagesService.deleteImage(user.profilePhotoPath);
+    }
     const storedImage = await this.imagesService.saveImageProcess(
       body,
       this.moduleName,
