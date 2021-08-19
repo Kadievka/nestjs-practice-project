@@ -166,11 +166,18 @@ export class UsersService {
     Object.assign(user, information);
     await user.save();
     return {
+      email: user.email,
       nickname: user.nickname,
+      isAdmin: user.isAdmin,
       lastName: user.lastName,
       firstName: user.firstName,
       cellphone: user.cellphone,
       address: user.address,
+      profilePhotoId: user.profilePhotoId,
+      profilePhotoName: user.profilePhotoName,
+      profilePhotoType: user.profilePhotoType,
+      profilePhotoSize: user.profilePhotoSize,
+      profilePhotoPath: user.profilePhotoPath,
     };
   }
 
