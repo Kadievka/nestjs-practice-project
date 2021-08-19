@@ -12,6 +12,8 @@ import { userConstants } from './user.constants';
 import { PaginateModel, PaginateResult } from 'mongoose';
 import { EmailDto } from './dtos/email.dto';
 import { RandomService } from '../random/random.service';
+import { ImagesService } from 'src/images/images.service';
+import { Image } from 'src/images/image.model';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +21,10 @@ export class UsersService {
     private readonly authService: AuthService,
     private readonly randomService: RandomService,
     @InjectModel('User') private readonly UserModel: PaginateModel<User>,
+    private imagesService: ImagesService,
   ) {}
+
+  moduleName = 'USERS';
 
   userIndexSelectFields = {
     id: true,
@@ -161,11 +166,49 @@ export class UsersService {
     Object.assign(user, information);
     await user.save();
     return {
+      email: user.email,
       nickname: user.nickname,
+      isAdmin: user.isAdmin,
       lastName: user.lastName,
       firstName: user.firstName,
       cellphone: user.cellphone,
       address: user.address,
+      profilePhotoId: user.profilePhotoId,
+      profilePhotoName: user.profilePhotoName,
+      profilePhotoType: user.profilePhotoType,
+      profilePhotoSize: user.profilePhotoSize,
+      profilePhotoPath: user.profilePhotoPath,
+    };
+  }
+
+  async uploadProfilePhoto(email: string, body: Image) {
+    const user = await this.findUserByEmailOrThrowForbidden(email);
+    if (user.profilePhotoPath) {
+      await this.imagesService.deleteImage(user.profilePhotoPath);
+    }
+    const storedImage = await this.imagesService.saveImageProcess(
+      body,
+      this.moduleName,
+    );
+    user.profilePhotoId = storedImage._id;
+    user.profilePhotoName = storedImage.name;
+    user.profilePhotoType = storedImage.type;
+    user.profilePhotoSize = storedImage.size;
+    user.profilePhotoPath = storedImage.path;
+    await user.save();
+    return {
+      email: user.email,
+      nickname: user.nickname,
+      isAdmin: user.isAdmin,
+      lastName: user.lastName,
+      firstName: user.firstName,
+      cellphone: user.cellphone,
+      address: user.address,
+      profilePhotoId: user.profilePhotoId,
+      profilePhotoName: user.profilePhotoName,
+      profilePhotoType: user.profilePhotoType,
+      profilePhotoSize: user.profilePhotoSize,
+      profilePhotoPath: user.profilePhotoPath,
     };
   }
 
@@ -177,6 +220,11 @@ export class UsersService {
     firstName: string;
     cellphone: string;
     address: string;
+    profilePhotoId: string;
+    profilePhotoName: string;
+    profilePhotoType: string;
+    profilePhotoSize: number;
+    profilePhotoPath: string;
   }> {
     const user = await this.findUserByEmailOrThrowForbidden(email);
     return {
@@ -187,6 +235,11 @@ export class UsersService {
       firstName: user.firstName,
       cellphone: user.cellphone,
       address: user.address,
+      profilePhotoId: user.profilePhotoId,
+      profilePhotoName: user.profilePhotoName,
+      profilePhotoType: user.profilePhotoType,
+      profilePhotoSize: user.profilePhotoSize,
+      profilePhotoPath: user.profilePhotoPath,
     };
   }
 

@@ -17,7 +17,9 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(process.env.API_DOCS, app, document);
-  app.use(express.static(__dirname + '/../public'));
+  app.use(express.static('public'));
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

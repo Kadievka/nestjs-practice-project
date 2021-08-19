@@ -29,6 +29,11 @@ export const UserSchema = new mongoose.Schema(
     lastName: String,
     cellphone: String,
     address: String,
+    profilePhotoId: String,
+    profilePhotoName: String,
+    profilePhotoType: String,
+    profilePhotoSize: Number,
+    profilePhotoPath: String,
   },
   {
     timestamps: true,
@@ -51,4 +56,9 @@ export interface User extends mongoose.Document {
   createdAt: string;
   updatedAt: string;
   verifyPassword?;
+  profilePhotoId: string;
+  profilePhotoName: string;
+  profilePhotoType: string;
+  profilePhotoSize: number;
+  profilePhotoPath: string;
 }
