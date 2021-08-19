@@ -186,7 +186,20 @@ export class UsersService {
     user.profilePhotoSize = storedImage.size;
     user.profilePhotoPath = storedImage.path;
     await user.save();
-    return user;
+    return {
+      email: user.email,
+      nickname: user.nickname,
+      isAdmin: user.isAdmin,
+      lastName: user.lastName,
+      firstName: user.firstName,
+      cellphone: user.cellphone,
+      address: user.address,
+      profilePhotoId: user.profilePhotoId,
+      profilePhotoName: user.profilePhotoName,
+      profilePhotoType: user.profilePhotoType,
+      profilePhotoSize: user.profilePhotoSize,
+      profilePhotoPath: user.profilePhotoPath,
+    };
   }
 
   async getUserProfile(email: string): Promise<{
@@ -197,6 +210,11 @@ export class UsersService {
     firstName: string;
     cellphone: string;
     address: string;
+    profilePhotoId: string;
+    profilePhotoName: string;
+    profilePhotoType: string;
+    profilePhotoSize: number;
+    profilePhotoPath: string;
   }> {
     const user = await this.findUserByEmailOrThrowForbidden(email);
     return {
@@ -207,6 +225,11 @@ export class UsersService {
       firstName: user.firstName,
       cellphone: user.cellphone,
       address: user.address,
+      profilePhotoId: user.profilePhotoId,
+      profilePhotoName: user.profilePhotoName,
+      profilePhotoType: user.profilePhotoType,
+      profilePhotoSize: user.profilePhotoSize,
+      profilePhotoPath: user.profilePhotoPath,
     };
   }
 

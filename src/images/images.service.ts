@@ -42,7 +42,7 @@ export class ImagesService {
 
     await this.saveFile(path, buffer);
 
-    image.path = `${filePath}/${fileName}.${type}`;
+    image.path = `${process.env.UPLOADS_DIRECTORY}/${module}/${fileName}.${type}`;
     return this.saveImage(image);
   }
 

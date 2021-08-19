@@ -348,6 +348,11 @@ export class UsersController {
     firstName: string;
     cellphone: string;
     address: string;
+    profilePhotoId: string;
+    profilePhotoName: string;
+    profilePhotoType: string;
+    profilePhotoSize: number;
+    profilePhotoPath: string;
   }> {
     return this.userService.getUserProfile(req.user.email);
   }
