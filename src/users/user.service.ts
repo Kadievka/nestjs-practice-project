@@ -12,6 +12,7 @@ import { userConstants } from './user.constants';
 import { PaginateModel, PaginateResult } from 'mongoose';
 import { EmailDto } from './dtos/email.dto';
 import { RandomService } from '../random/random.service';
+import { ProfilePhotoDto } from './dtos/profilePhoto.dto';
 
 @Injectable()
 export class UsersService {
@@ -167,6 +168,14 @@ export class UsersService {
       cellphone: user.cellphone,
       address: user.address,
     };
+  }
+
+  async uploadProfilePhoto(email: string, body: ProfilePhotoDto) {
+    const user = await this.findUserByEmailOrThrowForbidden(email);
+    console.log(user);
+    console.log(body);
+    //TODO file service to save image
+    return user;
   }
 
   async getUserProfile(email: string): Promise<{

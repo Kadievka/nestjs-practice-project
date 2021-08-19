@@ -17,6 +17,7 @@ import { JoiValidationPipe } from '../pipes/joi.validation.pipe';
 import { loginSchema } from './schemas/login.schema';
 import { emailSchema } from './schemas/email.schema';
 import { profileSchema } from './schemas/profile.schema';
+import { profilePhotoSchema } from './schemas/profilePhoto.schema';
 import { JwtAuthGuard } from '../auth/jwtAuth.guard';
 import {
   ApiTags,
@@ -28,6 +29,7 @@ import {
 } from '@nestjs/swagger';
 import { EmailDto } from './dtos/email.dto';
 import { ProfileDto } from './dtos/profile.dto';
+import { ProfilePhotoDto } from './dtos/profilePhoto.dto';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
@@ -348,6 +350,15 @@ export class UsersController {
     address: string;
   }> {
     return this.userService.getUserProfile(req.user.email);
+  }
+
+  @Post('/profile-photo')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Uploads an user profile photo' })
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new JoiValidationPipe(profilePhotoSchema))
+  uploadProfilePhoto(@Req() req, @Body() body: ProfilePhotoDto) {
+    return this.userService.uploadProfilePhoto(req.user.email, body);
   }
 
   @Get('/manage-get-all')
